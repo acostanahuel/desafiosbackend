@@ -1,52 +1,27 @@
-const ProductManager = require("../ProductManager");
-let productManager = new ProductManager();
+const express = require('express');
+const app = express();
+const ProductManager = require('./ProductManager');
+const productManager = new ProductManager();
 
-
-const express = require (`express`)
-const app = express();      //nos da nuestro enotorno de express
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
+const getProducts = async () => products = await productManager.getProducts();
+getProducts();
 
-const prod = require ("../database/products.json");
+app.get("/products", (request, response) => {response.send(products);});
 
+const getProductsByID = async (id) => getProductByID = await productManager.getProductById(id);
 
-////mostramos los 10 productos//
-app.get("/products", (request, response) => {
-    response.send(JSON.stringify(prod));
+app.get("/products/:pid", (request, response) => {
+  getProductsByID(parseInt(request.params.pid))
+  response.send(getProductByID);
 });
 
+app.get("/products:query", (request, response) => {
+  let limit = request.query.limit;
+  limit ? response.send(products.filter(p => p.id <= limit - 1)) : response.send(products);
+});
 
-///mostramos solo 5 productos 
-
-// app.get("/products/query", (request, response) => {
-//     let limit = request.query;
-//     const fiveProducts = productManager.getProducts();
-//     if(limit){
-//         function limitObject (array, limit) {
-//             return array.splice (0, limit);
-//      }
-//      response.send(limitObject(prod, limit));
-//     }
-//      response.send(products);
-// });
-
-
-
-
-///mostramos el id2 ///
-app.get("/products/:id", (request, response)=>{
-    const products = prod.find(p => p.id = request.params.id)
-    if(products){
-      response.send(products);
-    }
-    response.send({message: "User not found"});
-  ;})
-
-
-
-
-const SERVER_PORT= 8080;
-app.listen(SERVER_PORT, () => { 
-    console.log(`Servidor escuchando por el puerto: ${SERVER_PORT}`);
-});  
+const SERVER_PORT = 8080;
+app.listen(SERVER_PORT, () => { console.log(`Server running in port ${SERVER_PORT}`); });
